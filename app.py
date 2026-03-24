@@ -11,13 +11,29 @@ import uuid
 load_dotenv()
 
 # Supabase configuration
-URL = os.getenv("SUPABASE_URL")
-KEY = os.getenv("SUPABASE_KEY")
+# Attempt to get from st.secrets (Cloud) first, then os.getenv (Local)
+URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
+KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
+GEMINI_KEY = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
 
 @st.cache_resource
 def get_supabase_client() -> Client:
+    # Improved check to help user differentiate between local and cloud setup
     if not URL or not KEY or URL == "your_supabase_url_here":
-        st.error("Please configure SUPABASE_URL and SUPABASE_KEY in the .env file.")
+        st.error("### ⚠️ Supabase Credentials Missing")
+        if "STREAMLIT_RUNTIME_ENV" in os.environ: # Detecting cloud-like env
+             st.markdown("""
+             To fix this on Streamlit Cloud:
+             1. Go to **Manage App** > **Settings** > **Secrets**.
+             2. Add the following to the text box:
+             ```toml
+             SUPABASE_URL = "your_url"
+             SUPABASE_KEY = "your_key"
+             GEMINI_API_KEY = "your_gemini_key"
+             ```
+             """)
+        else:
+             st.error("Please configure SUPABASE_URL and SUPABASE_KEY in your .env file.")
         st.stop()
     return create_client(URL, KEY)
 
