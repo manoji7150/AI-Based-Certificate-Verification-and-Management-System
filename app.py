@@ -12,9 +12,14 @@ load_dotenv()
 
 # Supabase configuration
 # Attempt to get from st.secrets (Cloud) first, then os.getenv (Local)
-URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
-KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
-GEMINI_KEY = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+try:
+    URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
+    KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
+    GEMINI_KEY = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+except Exception:
+    URL = os.getenv("SUPABASE_URL")
+    KEY = os.getenv("SUPABASE_KEY")
+    GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
 @st.cache_resource
 def get_supabase_client() -> Client:
@@ -67,11 +72,11 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
     
     :root {
-        --glass-bg: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-blur: blur(16px);
+        --glass-bg: rgba(255, 255, 255, 0.6);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-blur: blur(12px);
         --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
-        --accent-color: #38bdf8;
+        --accent-color: #0284c7;
     }
 
     html, body, [class*="css"] {
@@ -79,50 +84,65 @@ st.markdown("""
     }
     
     .stApp {
-        background: radial-gradient(circle at top left, #1e293b, #0f172a);
+        background: #ffffff;
         background-attachment: fixed;
-        color: #f8fafc;
+        color: #1e293b;
+    }
+
+    /* Sidebar Styling for White Theme */
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc !important;
+        border-right: 1px solid #e2e8f0;
+    }
+    
+    [data-testid="stSidebarNav"] {
+        background-color: #f8fafc !important;
+    }
+
+    /* Sidebar text colors */
+    [data-testid="stSidebar"] .stText, [data-testid="stSidebar"] p, [data-testid="stSidebar"] h2 {
+        color: #1e293b !important;
     }
 
     /* Modern Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: rgba(0,0,0,0); }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
     
     .main-header {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 2rem;
-        text-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        color: #1e40af; /* Solid deep blue */
+        margin-bottom: 1.5rem;
     }
     
-    /* Reusable Glass Card Component */
+    .stMarkdown h2, .stMarkdown h3 {
+        color: #334155;
+        font-weight: 600;
+    }
+    
+    /* Reusable Clean Card Component (replacing glass) */
     .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
         padding: 2rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease;
     }
     
     .glass-card:hover {
-        border-color: rgba(56, 189, 248, 0.4);
-        box-shadow: 0 8px 32px 0 rgba(56, 189, 248, 0.1);
+        border-color: rgba(3, 105, 161, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(3, 105, 161, 0.1);
         transform: translateY(-2px);
     }
 
     /* Metric Styling */
     [data-testid="stMetricValue"] {
         font-weight: 700;
-        color: var(--accent-color);
+        color: #3b82f6; /* Blue metrics as in image */
     }
 
     /* Tab Styling */
@@ -132,11 +152,11 @@ st.markdown("""
     }
 
     .stTabs [data-baseweb="tab"] {
-        background-color: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 12px 12px 0 0;
-        padding: 10px 20px;
-        color: #94a3b8;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px 8px 0 0;
+        padding: 8px 16px;
+        color: #475569;
     }
 
     .stTabs [aria-selected="true"] {
@@ -146,21 +166,22 @@ st.markdown("""
     }
     
     .stButton>button {
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.6rem 2rem;
-        font-weight: 600;
-        width: 100%;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        background: #3b82f6 !important; /* Solid Blue */
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        width: 100% !important;
+        transition: background 0.2s ease !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
     }
     
     .stButton>button:hover {
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-        transform: translateY(-1px);
+        background: #2563eb !important;
+        box-shadow: none !important;
+        transform: none !important;
     }
     
     .status-pending { color: #fbbf24; font-weight: bold; }
@@ -172,10 +193,73 @@ st.markdown("""
         max-width: 500px;
         margin: 0 auto;
         padding: 2rem;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        backdrop-filter: var(--glass-blur);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Fix Input Fields for Readability */
+    div[data-baseweb="input"] {
+        background-color: white !important;
+        border-radius: 8px !important;
+        border: 1px solid #ccc !important;
+        padding: 1px !important;
+    }
+    
+    div[data-baseweb="input"] input {
+        color: black !important;
+        background-color: white !important;
+        -webkit-text-fill-color: black !important;
+    }
+    
+    div[aria-label="Email Address"], div[aria-label="Password"], 
+    div[aria-label="Staff Email"], div[aria-label="Password"] {
+        color: #1e293b !important;
+    }
+
+    /* Force all text inside tables and dataframes to be dark */
+    .stTable, [data-testid="stTable"], [data-testid="stDataFrame"], [data-testid="stTable"] * {
+        color: #1e293b !important;
+    }
+    
+    .stTable td, .stTable th {
+        color: #1e293b !important;
+        background-color: white !important;
+    }
+
+    /* Fix for Selectboxes and other widgets */
+    div[data-baseweb="select"] * {
+        color: black !important;
+    }
+    
+    div[data-baseweb="select"] > div {
+        background-color: white !important;
+        border: 1px solid #cbd5e1 !important; /* Visible border */
+        border-radius: 8px !important;
+    }
+    
+    div[role="listbox"] * {
+        color: black !important;
+    }
+
+    /* Input Field Border Update */
+    div[data-baseweb="input"] {
+        background-color: white !important;
+        border-radius: 8px !important;
+        border: 1px solid #cbd5e1 !important; /* Consistent border */
+        padding: 1px !important;
+    }
+
+    /* General text visibility fallback */
+    .stMarkdown, .stText, p, span, label, li, td, th {
+        color: #1e293b !important;
+    }
+
+    /* Placeholder color */
+    ::placeholder {
+        color: #666666 !important;
+        opacity: 1; 
     }
 </style>
 """, unsafe_allow_html=True)
@@ -264,8 +348,8 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- Sidebar Navigation (Authenticated) ---
-st.sidebar.markdown(f"<h2 style='color: #38bdf8;'>👋 Hello, {st.session_state.user_info.get('full_name', 'User')}</h2>", unsafe_allow_html=True)
-st.sidebar.markdown(f"<p style='color: #94a3b8;'>Logged in as {st.session_state.user_role}</p>", unsafe_allow_html=True)
+st.sidebar.markdown(f"<h2 style='color: #0369a1;'>👋 Hello, {st.session_state.user_info.get('full_name', 'User')}</h2>", unsafe_allow_html=True)
+st.sidebar.markdown(f"<p style='color: #475569;'>Logged in as {st.session_state.user_role}</p>", unsafe_allow_html=True)
 
 # Build navigation options based on role
 nav_options = []

@@ -18,7 +18,7 @@ def show_page(supabase):
         st.markdown(f"<div class='glass-card'><h3>Welcome, {student['full_name']}</h3><p>{student['roll_number']} | {student.get('email', 'N/A')}</p></div>", unsafe_allow_html=True)
     with col2:
         points = student.get('points') if student.get('points') is not None else 0
-        st.markdown(f"<div class='glass-card'><h3>Total Points</h3><h2 style='color: #fbbf24;'>{points}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='glass-card'><h3>Total Points</h3><h2 style='color: #d97706;'>{points}</h2></div>", unsafe_allow_html=True)
     with col3:
         if points < 10:
             st.warning("⚠️ Low Participation Alert: Keep participating in events to earn more points!")
@@ -153,13 +153,13 @@ def show_page(supabase):
             st.table(table_data)
             
             # Optional: Add clear expanders for details/viewing
-            st.markdown("#### Detailed View")
+            st.markdown("#### 🔽 Detailed View")
             for cert in certs_data:
                 status_color = {
-                    "Pending": "#fbbf24",
-                    "Approved": "#10b981",
-                    "Rejected": "#ef4444"
-                }.get(cert['status'], "#ffffff")
+                    "Pending": "#b45309",
+                    "Approved": "#059669",
+                    "Rejected": "#dc2626"
+                }.get(cert['status'], "#1e293b")
                 
                 with st.expander(f"{cert['event_name']} - {cert['status']}"):
                     st.write(f"**Event Type:** {cert['event_type']}")

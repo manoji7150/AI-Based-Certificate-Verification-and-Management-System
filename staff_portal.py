@@ -9,7 +9,7 @@ def show_page(supabase):
     tabs = st.tabs(["📢 Pending Approvals", "📊 Department Analytics", "🏆 Leaderboard", "💬 AI Assistant"])
     
     with tabs[0]:
-        st.subheader("Pending Certificate Reviews")
+        st.subheader("📋 Pending Certificate Reviews")
         
         # REMOVED JOIN QUERY: Fetch certificates and students separately to avoid APIError
         try:
@@ -137,7 +137,7 @@ def show_page(supabase):
                 y='Total Students Participated', 
                 color='Department Name',
                 title="Student Participation by Department",
-                template="plotly_dark",
+                template="plotly_white",
                 text_auto=True
             )
             fig.update_layout(showlegend=False)
@@ -159,7 +159,7 @@ def show_page(supabase):
             st.info("No data available for analytics yet.")
 
     with tabs[2]:
-        st.subheader("Student Leaderboard")
+        st.subheader("🏆 Student Leaderboard")
         # Top students based on points
         leaders = supabase.table("students").select("full_name, roll_number, department, points").order("points", desc=True).limit(10).execute()
         
